@@ -67,7 +67,7 @@ class _ChildScreenState extends State<ChildScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('FamBite - Add Grocery')),
+      appBar: AppBar(title: const Text("Bill your parent")),
       drawer: const UserDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -75,9 +75,9 @@ class _ChildScreenState extends State<ChildScreen> {
           key: _formKey,
           child: Column(
             children: [
-              Lottie.asset('assets/lottie/checkout.json', height: 150),
+              Lottie.asset('lib/assets/lottie/checkout.json', height: 150),
               const SizedBox(height: 12),
-              const Text('Submit grocery items to your parents'),
+              const Text('Submit grocery items to your parent'),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _itemController,

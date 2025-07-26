@@ -62,7 +62,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     if (_registered) {
       return Scaffold(
-        body: Center(child: Lottie.asset('assets/lottie/success.json')),
+        body: Center(child: Lottie.asset('lib/assets/lottie/success.json')),
       );
     }
     return Scaffold(
@@ -71,7 +71,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Lottie.asset('assets/lottie/register.json', width: 150),
+            Lottie.asset('lib/assets/lottie/register.json', width: 150),
             const SizedBox(height: 20),
             Form(
               key: _formKey,

@@ -41,12 +41,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('FamBite Sign Up')),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Lottie.asset('assets/lottie/register.json', width: 150),
+            Lottie.asset('lib/assets/lottie/register.json', width: 150),
             const SizedBox(height: 20),
             Form(
               key: _formKey,

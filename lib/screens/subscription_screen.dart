@@ -62,7 +62,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       return Scaffold(
         body: Center(
           child: Lottie.asset(
-            'assets/lottie/success.json',
+            'lib/assets/lottie/success.json',
             width: 200,
             repeat: false,
           ),
@@ -78,7 +78,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Lottie.asset(
-              'assets/lottie/subscribe.json',
+              'lib/assets/lottie/subscribe.json',
               width: 180,
               repeat: true,
             ),
@@ -100,7 +100,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       width: 20,
                       child: CircularProgressIndicator(),
                     )
-                  : const Text('Subscribe Now'),
+                  : const Text('Subscribe Now!'),
             ),
           ],
         ),

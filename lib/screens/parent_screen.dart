@@ -57,7 +57,7 @@ class _ParentScreenState extends State<ParentScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('FamBite - Grocery List')),
+      appBar: AppBar(title: const Text('Grocery List')),
       drawer: const UserDrawer(),
       body: StreamBuilder<DatabaseEvent>(
         stream: _itemsRef!.onValue,
@@ -76,7 +76,7 @@ class _ParentScreenState extends State<ParentScreen> {
 
           return Column(
             children: [
-              Lottie.asset('assets/lottie/checkout.json', height: 130),
+              Lottie.asset('lib/assets/lottie/checkout.json', height: 130),
               Expanded(
                 child: ListView(
                   children: items.entries.map((entry) {
