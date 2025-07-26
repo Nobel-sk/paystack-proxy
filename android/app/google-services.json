@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "762357524031",
+    "firebase_url": "https://fambite-a7686-default-rtdb.firebaseio.com",
+    "project_id": "fambite-a7686",
+    "storage_bucket": "fambite-a7686.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762357524031:android:6786cd54a2decaa90ffa8a",
+        "android_client_info": {
+          "package_name": "com.example.fam_bite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxSj01IZDWt4HN22oACJ_2gxDSoINlT3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
