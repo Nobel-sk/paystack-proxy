@@ -57,7 +57,25 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+  - lib/assets/lottie/checkout.json
+  - lib/assets/lottie/success.json
+  - lib/assets/lottie/register.json
+  - lib/assets/lottie/subscribe.json
 
+  fonts:
+    - family: Poppins
+      fonts:
+          - asset: assets/fonts/Poppins-Regular.ttf
+          - asset: assets/fonts/Poppins-SemiBold.ttf
+            weight: 600
+          - asset: assets/fonts/Poppins-Bold.ttf
+            weight: 700
+
+    
+      
+ 
+       
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -65,18 +83,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
 
-assets:
-  - assets/lottie/checkout.json
-  - assets/lottie/success.json
-  - assets/lottie/register.json
-  - assets/lottie/subscribe.json
 
 
-  fonts:
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
+
+    
+        
+          
