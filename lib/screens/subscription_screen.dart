@@ -8,10 +8,10 @@ import 'package:lottie/lottie.dart';
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
   @override
-  State<SubscriptionScreen> createState() => _SubscriptionScreenState();
+  State<SubscriptionScreen> createState() => SubscriptionScreenState();
 }
 
-class _SubscriptionScreenState extends State<SubscriptionScreen> {
+class SubscriptionScreenState extends State<SubscriptionScreen> {
   bool _loading = false;
   bool _complete = false;
   String? _error;

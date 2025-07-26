@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
-// 👇 This is the POST /subscribe route
+// ✅ Subscription endpoint (Flutter will call this URL)
 app.post('/subscribe', async (req, res) => {
   const { email, amount } = req.body;
 
@@ -19,7 +19,7 @@ app.post('/subscribe', async (req, res) => {
       'https://api.paystack.co/transaction/initialize',
       {
         email,
-        amount, // In kobo, so $1 => 100
+        amount, // must be in kobo (i.e., 100 for ₦1.00)
       },
       {
         headers: {
@@ -29,18 +29,21 @@ app.post('/subscribe', async (req, res) => {
       }
     );
 
-    res.json(response.data);
+    res.json(response.data); // return the authorization URL to Flutter
   } catch (error) {
     console.error('Paystack error:', error?.response?.data || error.message);
-    res.status(500).json({ error: 'Subscription failed' });
+    res
+      .status(500)
+      .json({ error: error?.response?.data?.message || 'Subscription failed' });
   }
 });
 
+// Basic home route (optional)
 app.get('/', (req, res) => {
   res.send('FamBite Paystack Proxy Running');
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
