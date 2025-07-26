@@ -1,106 +1,97 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:lottie/lottie.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
+
   @override
-  State<SubscriptionScreen> createState() => SubscriptionScreenState();
+  State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
-class SubscriptionScreenState extends State<SubscriptionScreen> {
+class _SubscriptionScreenState extends State<SubscriptionScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   bool _loading = false;
-  bool _complete = false;
-  String? _error;
 
   Future<void> _subscribe() async {
-    setState(() {
-      _loading = true;
-      _error = null;
+    if (!_formKey.currentState!.validate()) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _showError('You must be logged in');
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    final url = Uri.parse('https://paystack-proxy.onrender.com/subscribe');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'email': _emailController.text.trim(),
+      'amount': 100,
+      'userId': user.uid,
     });
 
     try {
-      final user = FirebaseAuth.instance.currentUser!;
-      final response = await http.post(
-        Uri.parse('https://paystack-proxy.onrender.com/subscribe'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': user.email ?? '',
-          'amount': 100, // Represents USD 1 in cents or kobo etc.
-        }),
-      );
+      final res = await http.post(url, headers: headers, body: body);
+      final data = jsonDecode(res.body);
 
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200 && data['status'] == true) {
-        await FirebaseDatabase.instance
-            .ref('users/${user.uid}/subscription')
-            .set({'active': true, 'since': DateTime.now().toIso8601String()});
-
-        if (!mounted) return;
-        setState(() => _complete = true);
-
-        await Future.delayed(const Duration(seconds: 2));
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/');
+      if (data['status'] == true) {
+        final authUrl = data['data']['authorization_url'];
+        await launchUrl(
+          Uri.parse(authUrl),
+          mode: LaunchMode.externalApplication,
+        );
       } else {
-        setState(() => _error = data['message'] ?? 'Subscription failed');
+        _showError('Failed: ${data['message']}');
       }
     } catch (e) {
-      if (!mounted) return;
-      setState(() => _error = 'Connection error');
+      _showError('Error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
+  void _showError(String msg) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_complete) {
-      return Scaffold(
-        body: Center(
-          child: Lottie.asset(
-            'lib/assets/lottie/success.json',
-            width: 200,
-            repeat: false,
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Subscribe')),
+      appBar: AppBar(title: const Text('Subscription')),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Lottie.asset(
-              'lib/assets/lottie/subscribe.json',
-              width: 180,
-              repeat: true,
-            ),
-            const SizedBox(height: 20),
+            Lottie.asset('lib/assets/lottie/subscribe.json', height: 180),
             const Text(
-              'Subscribe for \$1/month to access FamBite features',
+              'Subscribe to unlock full access for \$1/month',
               style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 14),
-            if (_error != null)
-              Text(_error!, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            Form(
+              key: _formKey,
+              child: TextFormField(
+                controller: _emailController,
+                enabled: !_loading,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (v) =>
+                    v != null && v.contains('@') ? null : 'Enter a valid email',
+              ),
+            ),
+            const SizedBox(height: 24),
             FilledButton(
               onPressed: _loading ? null : _subscribe,
               child: _loading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(),
-                    )
-                  : const Text('Subscribe Now!'),
+                  ? const CircularProgressIndicator()
+                  : const Text('Subscribe'),
             ),
           ],
         ),

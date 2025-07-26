@@ -1,8 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-require('dotenv').config();
+const admin = require('firebase-admin');
+
+const serviceAccount = require('./serviceAccountKey.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.FIREBASE_RTDB_URL,
+});
 
 const app = express();
 app.use(cors());
@@ -10,7 +18,12 @@ app.use(bodyParser.json());
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
-// ✅ Subscription endpoint (Flutter will call this URL)
+if (!PAYSTACK_SECRET_KEY) {
+  console.error('Missing PAYSTACK_SECRET_KEY');
+  process.exit(1);
+}
+
+// POST /subscribe
 app.post('/subscribe', async (req, res) => {
   const { email, amount } = req.body;
 
@@ -19,7 +32,8 @@ app.post('/subscribe', async (req, res) => {
       'https://api.paystack.co/transaction/initialize',
       {
         email,
-        amount, // must be in kobo (i.e., 100 for ₦1.00)
+        amount,
+        callback_url: `${process.env.BASE_URL}/callback`,
       },
       {
         headers: {
@@ -29,21 +43,47 @@ app.post('/subscribe', async (req, res) => {
       }
     );
 
-    res.json(response.data); // return the authorization URL to Flutter
+    res.json(response.data);
   } catch (error) {
-    console.error('Paystack error:', error?.response?.data || error.message);
-    res
-      .status(500)
-      .json({ error: error?.response?.data?.message || 'Subscription failed' });
+    console.error('Paystack initialize error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Subscription failed' });
   }
 });
 
-// Basic home route (optional)
-app.get('/', (req, res) => {
-  res.send('FamBite Paystack Proxy Running');
+// GET /callback
+app.get('/callback', (req, res) => {
+  res.send(`
+    <html>
+      <body style="font-family: sans-serif; text-align: center; margin-top: 40px;">
+        <h2>🎉 Payment Successful!</h2>
+        <p>You may now return to the FamBite app.</p>
+      </body>
+    </html>
+  `);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// POST /webhook (Paystack)
+app.post('/webhook', async (req, res) => {
+  const event = req.body;
+  if (event.event === 'charge.success') {
+    const email = event.data.customer.email;
+    const reference = event.data.reference;
+
+    const db = admin.database();
+    const snapshot = await db.ref('users').orderByChild('email').equalTo(email).once('value');
+
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        child.ref.update({
+          subscription: { active: true, reference },
+        });
+      });
+      console.log(`Subscription activated for ${email}`);
+    }
+  }
+  res.sendStatus(200);
 });
+
+app.get('/', (_, res) => res.send('FamBite Paystack Proxy is running'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
