@@ -110,56 +110,70 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('FamBite Registration')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Lottie.asset('lib/assets/lottie/register.json', width: 150),
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.grey[200],
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  DropdownButtonFormField<String>(
-                    value: _role,
-                    decoration: const InputDecoration(labelText: 'Role'),
-                    items: const [
-                      DropdownMenuItem(value: 'child', child: Text('Child')),
-                      DropdownMenuItem(value: 'parent', child: Text('Parent')),
-                    ],
-                    onChanged: (v) => setState(() => _role = v!),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _creating,
-                        onChanged: (v) => setState(() => _creating = v!),
-                      ),
-                      const Text('Create new family'),
-                    ],
-                  ),
-                  if (!_creating)
-                    TextFormField(
-                      controller: _familyCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Existing Family ID',
-                      ),
-                      validator: (v) =>
-                          v != null && v.isNotEmpty ? null : 'Enter family ID',
+                  Lottie.asset('lib/assets/lottie/register.json', width: 150),
+                  const SizedBox(height: 20),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        DropdownButtonFormField<String>(
+                          value: _role,
+                          decoration: const InputDecoration(labelText: 'Role'),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'child',
+                              child: Text('Child'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'parent',
+                              child: Text('Parent'),
+                            ),
+                          ],
+                          onChanged: (v) => setState(() => _role = v!),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _creating,
+                              onChanged: (v) => setState(() => _creating = v!),
+                            ),
+                            const Text('Create new family'),
+                          ],
+                        ),
+                        if (!_creating)
+                          TextFormField(
+                            controller: _familyCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Existing Family ID',
+                            ),
+                            validator: (v) => v != null && v.isNotEmpty
+                                ? null
+                                : 'Enter family ID',
+                          ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loading ? null : _register,
+                          child: _loading
+                              ? const CircularProgressIndicator()
+                              : const Text('Continue'),
+                        ),
+                      ],
                     ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _register,
-                    child: _loading
-                        ? const CircularProgressIndicator()
-                        : const Text('Continue'),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

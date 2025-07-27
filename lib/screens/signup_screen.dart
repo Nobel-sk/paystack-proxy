@@ -42,50 +42,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sign Up')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Lottie.asset('lib/assets/lottie/register.json', width: 150),
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.grey[200],
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: _emailCtrl,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    validator: (v) =>
-                        v != null && v.contains('@') ? null : 'Invalid email',
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _passwordCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscure ? Icons.visibility : Icons.visibility_off,
+                  Lottie.asset('lib/assets/lottie/register.json', width: 150),
+                  const SizedBox(height: 20),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _emailCtrl,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          validator: (v) => v != null && v.contains('@')
+                              ? null
+                              : 'Invalid email',
                         ),
-                        onPressed: () => setState(() => _obscure = !_obscure),
-                      ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _passwordCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscure
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _obscure = !_obscure),
+                            ),
+                          ),
+                          obscureText: _obscure,
+                          validator: (v) =>
+                              v != null && v.length >= 6 ? null : 'Min 6 chars',
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loading ? null : _signUp,
+                          child: _loading
+                              ? const CircularProgressIndicator()
+                              : const Text('Sign Up'),
+                        ),
+                      ],
                     ),
-                    obscureText: _obscure,
-                    validator: (v) =>
-                        v != null && v.length >= 6 ? null : 'Min 6 chars',
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _signUp,
-                    child: _loading
-                        ? const CircularProgressIndicator()
-                        : const Text('Sign Up'),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

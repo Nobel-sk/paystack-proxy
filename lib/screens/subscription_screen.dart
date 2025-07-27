@@ -66,34 +66,58 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Subscription')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Lottie.asset('lib/assets/lottie/subscribe.json', height: 180),
-            const Text(
-              'Subscribe to unlock full access for \$1/month',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: _emailController,
-                enabled: !_loading,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (v) =>
-                    v != null && v.contains('@') ? null : 'Enter a valid email',
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.white70,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lib/assets/lottie/subscribe.json',
+                      height: 180,
+                    ),
+                    const Text(
+                      'Subscribe to unlock full access for \$2/month',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      width: 100,
+                      padding: EdgeInsets.all(24),
+                      color: Colors.blueGrey,
+                      child: Column(
+                        children: [
+                          Form(
+                            key: _formKey,
+                            child: TextFormField(
+                              controller: _emailController,
+                              enabled: !_loading,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                              ),
+                              validator: (v) => v != null && v.contains('@')
+                                  ? null
+                                  : 'Enter a valid email',
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          FilledButton(
+                            onPressed: _loading ? null : _subscribe,
+                            child: _loading
+                                ? const CircularProgressIndicator()
+                                : const Text('Subscribe'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _loading ? null : _subscribe,
-              child: _loading
-                  ? const CircularProgressIndicator()
-                  : const Text('Subscribe'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

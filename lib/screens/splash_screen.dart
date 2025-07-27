@@ -22,17 +22,22 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          'FamBite\nStay Synced. Shop Smarter',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Center(
+            child: Text(
+              'FamBite\n Shop Smarter',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+                fontFamily: 'Poppins-BoldItalic.tff',
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

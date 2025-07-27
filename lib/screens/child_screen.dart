@@ -32,7 +32,7 @@ class _ChildScreenState extends State<ChildScreen> {
       if (familyId == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User not assigned to a family.')),
+            const SnackBar(content: Text("You're not assigned to a family")),
           );
         }
         return;
@@ -51,7 +51,7 @@ class _ChildScreenState extends State<ChildScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Item submitted')));
+        ).showSnackBar(const SnackBar(content: Text('Submitted!')));
       }
     } catch (e) {
       if (mounted) {
@@ -67,40 +67,42 @@ class _ChildScreenState extends State<ChildScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Bill your parent")),
+      appBar: AppBar(title: const Text("Bill your guardian")),
       drawer: const UserDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Lottie.asset('lib/assets/lottie/checkout.json', height: 150),
-              const SizedBox(height: 12),
-              const Text('Submit grocery items to your parent'),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _itemController,
-                decoration: const InputDecoration(
-                  labelText: 'Item Name',
-                  border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Lottie.asset('lib/assets/lottie/checkout.json', height: 150),
+                const SizedBox(height: 12),
+                const Text('Submit grocery items to your parent'),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _itemController,
+                  decoration: const InputDecoration(
+                    labelText: 'Item Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter an item' : null,
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter an item' : null,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _loading ? null : _submitItem,
-                icon: const Icon(Icons.send),
-                label: _loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Submit'),
-              ),
-            ],
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _loading ? null : _submitItem,
+                  icon: const Icon(Icons.send),
+                  label: _loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Submit'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
