@@ -79,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: _loading ? null : _signUp,
                     child: _loading
                         ? const CircularProgressIndicator()
-                        : const Text('Create Account'),
+                        : const Text('Sign Up'),
                   ),
                 ],
               ),

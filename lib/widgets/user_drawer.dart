@@ -5,6 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 class UserDrawer extends StatelessWidget {
   const UserDrawer({super.key});
 
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (context.mounted) context.go('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -37,7 +42,7 @@ class UserDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () => navigateAfterPop('/login'),
+            onTap: () => _logout(context),
           ),
         ],
       ),

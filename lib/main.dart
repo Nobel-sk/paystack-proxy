@@ -1,4 +1,5 @@
-import 'package:fam_bite/screens/signUp_screen.dart';
+import 'package:fam_bite/screens/signup_screen.dart';
+import 'package:fam_bite/screens/splash_screen.dart';
 import 'package:fam_bite/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +27,7 @@ class FamBiteApp extends StatelessWidget {
       title: 'FamBite',
       theme: appTheme(),
       routes: {
+        '/splash': (c) => const SplashScreen(),
         '/': (c) => const AuthWrapper(),
         '/login': (c) => const LoginScreen(),
         '/signup': (c) => const SignUpScreen(),
@@ -34,13 +36,14 @@ class FamBiteApp extends StatelessWidget {
         '/parent': (c) => const ParentScreen(),
         '/child': (c) => const ChildScreen(),
       },
-      initialRoute: '/',
+      initialRoute: '/splash',
     );
   }
 }
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -51,23 +54,26 @@ class AuthWrapper extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
+
         final user = authSnap.data;
         if (user == null) return const LoginScreen();
 
-        return FutureBuilder<DataSnapshot>(
-          future: FirebaseDatabase.instance.ref('users/${user.uid}').get(),
+        return StreamBuilder<DatabaseEvent>(
+          stream: FirebaseDatabase.instance.ref('users/${user.uid}').onValue,
           builder: (context, snap) {
-            if (snap.connectionState != ConnectionState.done) {
+            if (snap.connectionState != ConnectionState.active) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-            if (!snap.hasData || !snap.data!.exists) {
-              return const RegistrationScreen();
-            }
-            final data = Map<String, dynamic>.from(snap.data!.value as Map);
-            final subscribed = data['subscription']?['active'] == true;
-            final role = data['role'] as String? ?? 'child';
+
+            final data = snap.data?.snapshot.value;
+            if (data == null) return const RegistrationScreen();
+
+            final userMap = Map<String, dynamic>.from(data as Map);
+            final subscribed = userMap['subscription']?['active'] == true;
+            final role = userMap['role'] as String? ?? 'child';
+
             if (!subscribed) return const SubscriptionScreen();
             return role == 'parent'
                 ? const ParentScreen()

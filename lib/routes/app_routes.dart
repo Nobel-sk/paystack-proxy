@@ -46,5 +46,9 @@ final GoRouter appRouter = GoRouter(
       name: 'profile',
       builder: (context, state) => const ProfileScreen(),
     ),
+    GoRoute(
+      path: '/subscribe',
+      builder: (context, state) => const SubscriptionScreen(),
+    ),
   ],
 );

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
+
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
@@ -12,15 +14,19 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _familyCtrl = TextEditingController();
+
   bool _creating = false;
   String _role = 'child';
   bool _loading = false;
   bool _registered = false;
-  // ignore: unused_field
   String? _familyId;
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final nav = Navigator.of(context); // capture context before async gap
+    final scaffold = ScaffoldMessenger.of(context);
+
     setState(() => _loading = true);
 
     final user = FirebaseAuth.instance.currentUser!;
@@ -31,10 +37,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     if (!_creating) {
       final exists = (await db.ref('families/$fid').get()).exists;
-      if (!exists && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Family ID not found')));
+      if (!exists) {
+        scaffold.showSnackBar(
+          const SnackBar(content: Text('Family ID not found')),
+        );
         setState(() => _loading = false);
         return;
       }
@@ -47,24 +53,61 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     });
     await db.ref('families/$fid/users/${user.uid}').set(true);
 
-    if (!mounted) return;
     setState(() {
       _familyId = fid;
       _loading = false;
       _registered = true;
     });
 
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) Navigator.pushReplacementNamed(context, '/');
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) nav.pushReplacementNamed('/');
   }
 
   @override
   Widget build(BuildContext context) {
     if (_registered) {
       return Scaffold(
-        body: Center(child: Lottie.asset('lib/assets/lottie/success.json')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Lottie.asset('lib/assets/lottie/success.json'),
+              const SizedBox(height: 16),
+              if (_role == 'parent' && _familyId != null) ...[
+                const Text('Your Family ID:', style: TextStyle(fontSize: 16)),
+                SelectableText(
+                  _familyId!,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final scaffold = ScaffoldMessenger.of(
+                      context,
+                    ); // Capture first
+                    final id = _familyId;
+                    if (id != null) {
+                      await Clipboard.setData(ClipboardData(text: id));
+                      if (mounted) {
+                        scaffold.showSnackBar(
+                          const SnackBar(content: Text('Family ID copied!')),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy Family ID'),
+                ),
+              ],
+            ],
+          ),
+        ),
       );
     }
+
     return Scaffold(
       appBar: AppBar(title: const Text('FamBite Registration')),
       body: Padding(
